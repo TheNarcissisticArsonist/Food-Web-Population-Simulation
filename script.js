@@ -57,6 +57,7 @@ function userInputSetup() {
 	page.pause.addEventListener("click", pause);
 	page.resume.addEventListener("click", resume);
 	page.numOrgs.addEventListener("change", updateNumOrgs);
+	page.orgDataArr = [];
 }
 function mouseMoved(e) {
 	oldMouseLocation[0] = mouseLocation[0];
@@ -106,7 +107,35 @@ function resume() {
 }
 function updateNumOrgs() {
 	console.log("FUNCTION CALL: updateNumOrgs()");
-	//
+	
+	var rawNum = page.numOrgs.value;
+	var num = Number(rawNum);
+	if(!isNaN(num)) {
+		if(num > 0) {
+			page.orgDataArr = [];
+			for(var i=0; i<num; ++i) {
+				var singleCont = document.createElement("div");
+				singleCont.setAttribute("id", "orgData_" + num);
+				
+				var nameLabel = document.createElement("pre");
+				nameLabel.appendChild(document.createTextNode("Name: "));
+				var nameInput = document.createElement("textarea");
+				nameInput.setAttribute("id", "orgData_" + num + "_NAME");
+				var predListLabel = document.createElement("pre");
+				predListLabel.appendChild(document.createTextNode("Predators: "));
+				var predListInput = document.createElement("textarea");
+				predListInput.setAttribute("id", "orgData_" + num + "_PREDLIST");
+				var predConstLabel = document.createElement("pre");
+				predConstLabel.appendChild(document.createTextNode(" Constants: "));
+				var predConstInput = document.createElement("textarea");
+				predConstInput.setAttribute("id", "orgData_" + num + "_PREDCONST");
+
+				var br = document.createElement("br");
+
+				var elementList = [nameLabel, nameInput, br, predListLabel, predListInput, predConstLabel, predConstInput, br];
+			}
+		}
+	}
 }
 function startSimulation() {
 	console.log("FUNCTION CALL: startSimulation()");
