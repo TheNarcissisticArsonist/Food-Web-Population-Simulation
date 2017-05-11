@@ -72,9 +72,11 @@ function mouseMoved(e) {
 }
 function mouseDown(e) {
 	//
+	mouseButtons[String(event.which)] = true;
 }
 function mouseup(e) {
 	//
+	mouseButtons[String(event.which)] = false;
 }
 function mouseEnterCanvas(e) {
 	//
