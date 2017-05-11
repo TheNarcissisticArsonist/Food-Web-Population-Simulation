@@ -19,6 +19,7 @@ var mouseButtons = {}; //An object containing the states of mouse buttons.
 var overCanvas; //Whether or not the cursor is over the canvas.
 var pos = []; //The position on the graph of the location of the center of the graph window.
 var zoom; //The zoom level of the graph display.
+var paused; //The pause/resume state of the simulation.
 
 //------------------------------------------------------------
 // Classes
@@ -95,21 +96,22 @@ function mouseLeaveCanvas(e) {
 	//
 	overCanvas = false;
 }
-function startSimulation() {
-	console.log("FUNCTION CALL: startSimulation()");
-	//
-}
 function pause() {
 	console.log("Paused");
-	//
+	paused = true;
 }
 function resume() {
 	console.log("Resumed");
-	//
+	paused = false;
 }
 function updateNumOrgs() {
 	console.log("FUNCTION CALL: updateNumOrgs()");
 	//
+}
+function startSimulation() {
+	console.log("FUNCTION CALL: startSimulation()");
+	
+	paused = false;
 }
 
 //------------------------------------------------------------
