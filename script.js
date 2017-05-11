@@ -80,9 +80,11 @@ function mouseup(e) {
 }
 function mouseEnterCanvas(e) {
 	//
+	overCanvas = true;
 }
 function mouseLeaveCanvas(e) {
 	//
+	overCanvas = false;
 }
 function startSimulation() {
 	console.log("FUNCTION CALL: startSimulation()");
