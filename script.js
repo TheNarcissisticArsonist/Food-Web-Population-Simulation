@@ -4,6 +4,8 @@
 
 var defaultZoom = 1; //The default zoom level. Zoom is given in pixels per graph unit. The graph is done in units of years and number of organisms.
 var dragPanningConstant = 1/defaultZoom; //This constant slows down the rate that dragging pans the graph.
+var zoomPowerConstant = 1.1; //This is the exponent that zooming in and out uses.
+var mouseWheelCalibrationConstant = 53; //The e.deltaY value when you scroll my personal mouse one notch. Other mice may be different.
 
 //------------------------------------------------------------
 // Global Variables
@@ -77,6 +79,13 @@ function mouseDown(e) {
 function mouseup(e) {
 	//
 	mouseButtons[String(event.which)] = false;
+}
+function wheel(e) {
+	e.preventDefault();
+	e.returnValue = false;
+	var wheelChange = e.deltaY;
+	var zoomMultiplier = Math.pow(zoomPowerConstant, wheelChange*(1/mouseWheelCalibrationConstant)); //I may want to change how this zoom works later.
+	zoom /= zoomMultiplier;
 }
 function mouseEnterCanvas(e) {
 	//
