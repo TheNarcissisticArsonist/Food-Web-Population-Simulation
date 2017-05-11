@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Food Web Population Simulator</title>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+
+	<div id="leftCont" class="container">
+		<p>Instructions...</p>
+		<br>
+		<p>More Instructions...</p>
+		<br>
+		<!-- Insert faint horizontal line here? -->
+		<pre>Number of Organisms in the Food Web: </pre><textarea id="numOrgs"></textarea><br>
+		<div id="orgDataInputCont" class="container" style="display: none;">
+			<!-- When you enter the number of organisms, this div is populated with textareas for their information. -->
+			<!-- This will contain a lot of information for each organism, including initial population, predators, prey, and appropriate simulation constants. -->
+		</div><br>
+		<pre>Graph Speed Multiplier: </pre><textarea id="speedMult"></textarea><br>
+		<div id="startSimulation" class="button" style="display: none;">Simulate</div>
+		<div id="pause" class="button" style="display: none;">&#9646;&#9646;</div>
+		<div id="resume" class="button" style="display: none;">&#9654;</div>
+	</div>
+	<div id="rightCont" class="container">
+		<canvas id="graphArea" width="900px" height="900px"></canvas>
+	</div>
+
+	<script type="text/javascript" src="./script.js"></script>
+</body>
+</html>

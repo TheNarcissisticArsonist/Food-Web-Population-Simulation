@@ -1,0 +1,31 @@
+body {
+	background-color: #eeeeee;
+}
+textarea {
+	vertical-align: middle;
+	height: 18px;
+	resize: horizontal;
+}
+pre {
+	margin: 2px;
+	display: inline-block;
+}
+p {
+	display: inline-block;
+}
+canvas {
+	border: 1px dotted black;
+	background: white;
+}
+div {
+	display: inline-block;
+}
+
+div.container {
+	vertical-align: top;
+	padding: 0px 50px;
+}
+div.button {
+	padding: 5px;
+	background-color: #ffaaaa;
+}
