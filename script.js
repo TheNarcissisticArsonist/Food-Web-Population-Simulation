@@ -165,6 +165,7 @@ function updateNumOrgs() {
 				page.orgDataArr.push(document.getElementById("orgData_" + i));
 			}
 			page.orgDataCont.style.display = "inline-block";
+			page.orgDataArr[0].childNodes[1].firstChild.focus();
 		}
 		else {
 			hideOrgDataInput();
