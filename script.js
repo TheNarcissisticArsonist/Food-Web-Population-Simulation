@@ -169,10 +169,12 @@ function updateNumOrgs() {
 		}
 		else {
 			hideOrgDataInput();
+			page.numOrgs.focus();
 		}
 	}
 	else {
 		hideOrgDataInput();
+		page.numOrgs.focus();
 	}
 }
 function hideOrgDataInput() {
