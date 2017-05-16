@@ -112,30 +112,76 @@ function updateNumOrgs() {
 	var num = Number(rawNum);
 	if(!isNaN(num)) {
 		if(num > 0) {
+			while(page.orgDataCont.firstChild) {
+				page.orgDataCont.removeChild(page.orgDataCont.firstChild);
+			}
 			page.orgDataArr = [];
 			for(var i=0; i<num; ++i) {
 				var singleCont = document.createElement("div");
-				singleCont.setAttribute("id", "orgData_" + num);
+				singleCont.setAttribute("id", "orgData_" + i);
+				singleCont.classList.add("orgDataCont")
+
+				var leftCont = document.createElement("div");
+				leftCont.style.textAlign = "right";
+				var rightCont = document.createElement("div");
 				
 				var nameLabel = document.createElement("pre");
 				nameLabel.appendChild(document.createTextNode("Name: "));
-				var nameInput = document.createElement("textarea");
-				nameInput.setAttribute("id", "orgData_" + num + "_NAME");
 				var predListLabel = document.createElement("pre");
 				predListLabel.appendChild(document.createTextNode("Predators: "));
-				var predListInput = document.createElement("textarea");
-				predListInput.setAttribute("id", "orgData_" + num + "_PREDLIST");
 				var predConstLabel = document.createElement("pre");
-				predConstLabel.appendChild(document.createTextNode(" Constants: "));
+				predConstLabel.appendChild(document.createTextNode("Constants: "));
+				var preyListLabel = document.createElement("pre");
+				preyListLabel.appendChild(document.createTextNode("Prey: "));
+				var preyConstLabel = document.createElement("pre");
+				preyConstLabel.appendChild(document.createTextNode("Constants: "));
+
+
+				var nameInput = document.createElement("textarea");
+				nameInput.setAttribute("id", "orgData_" + i + "_NAME");
+				var predListInput = document.createElement("textarea");
+				predListInput.setAttribute("id", "orgData_" + i + "_PREDLIST");
 				var predConstInput = document.createElement("textarea");
-				predConstInput.setAttribute("id", "orgData_" + num + "_PREDCONST");
+				predConstInput.setAttribute("id", "orgData_" + i + "_PREDCONST");
+				var preyListInput = document.createElement("textarea");
+				preyListInput.setAttribute("id", "orgData_" + i + "_PREYLIST");
+				var preyConstInput = document.createElement("textarea");
+				preyConstInput.setAttribute("id", "orgData_" + i + "_PREYCONST");
 
-				var br = document.createElement("br");
+				var leftElementsList = [nameLabel, br(), predListLabel, br(), predConstLabel, br(), preyListLabel, br(), preyConstLabel, br()];
+				var rightElementsList = [nameInput, br(), predListInput, br(), predConstInput, br(), preyListInput, br(), preyConstInput, br()];
 
-				var elementList = [nameLabel, nameInput, br, predListLabel, predListInput, predConstLabel, predConstInput, br];
+				for(var j=0; j<leftElementsList.length; ++j) {
+					leftCont.appendChild(leftElementsList[j]);
+				}
+				for(var j=0; j<rightElementsList.length; ++j) {
+					rightCont.appendChild(rightElementsList[j]);
+				}
+				singleCont.appendChild(leftCont);
+				singleCont.appendChild(rightCont);
+				page.orgDataCont.appendChild(singleCont);
+				page.orgDataCont.appendChild(br());
+				page.orgDataCont.appendChild(br());
+				page.orgDataArr.push(document.getElementById("orgData_" + i));
 			}
+			page.orgDataCont.style.display = "inline-block";
+		}
+		else {
+			hideOrgDataInput();
 		}
 	}
+	else {
+		hideOrgDataInput();
+	}
+}
+function hideOrgDataInput() {
+	console.log("FUNCTION CALL: hideOrgDataInput()");
+
+	page.orgDataCont.style.display = "none";
+}
+function br() {
+	//
+	return document.createElement("br");
 }
 function startSimulation() {
 	console.log("FUNCTION CALL: startSimulation()");

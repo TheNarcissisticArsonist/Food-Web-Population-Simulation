@@ -29,3 +29,14 @@ div.button {
 	padding: 5px;
 	background-color: #ffaaaa;
 }
+
+div.orgDataCont div {
+	vertical-align: top;
+}
+div.orgDataCont div textarea {
+	resize: horizontal;
+	width: ;
+}
+div.orgDataCont div pre {
+	margin: 4.5px 0px;
+}
