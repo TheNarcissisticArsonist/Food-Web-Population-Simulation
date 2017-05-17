@@ -10,7 +10,8 @@ var axisColors = [["#000000", "#000000"], ["#000000", "#000000"]]; //The colors 
 var graphTickLength = 10; //How tall the tick marks are on the graph.
 var drawGridlines = true;
 var gridlinesColor = "#eeeeee";
-var units = "";
+var units = ["years", ""];
+var defaultTimeRate = 60*60*24*365; //1 year per second.
 
 //------------------------------------------------------------
 // Global Variables
@@ -28,6 +29,7 @@ var paused; //The pause/resume state of the simulation.
 var orgData = []; //List of organisms' data.
 var t0; //Used in time difference calculations for animation speed.
 var dt; //Used in time difference calculations for animation speed.
+var timeRate = defaultTimeRate; //The amount of simulation time which passes per second.
 
 //------------------------------------------------------------
 // Classes
@@ -50,7 +52,7 @@ function setup() {
 
 	page.numOrgs = document.getElementById("numOrgs");
 	page.orgDataCont = document.getElementById("orgDataInputCont");
-	page.speedMult = document.getElementById("speedMult");
+	page.speedMult = document.getElementById("speedMult"); page.speedMult.value = defaultTimeRate;
 	page.startSim = document.getElementById("startSim");
 	page.pause = document.getElementById("pause");
 	page.resume = document.getElementById("resume");
@@ -225,6 +227,7 @@ function startSimulation() {
 	console.log("FUNCTION CALL: startSimulation()");
 	
 	getOrgInput();
+	timeRate = Number(page.speedMult.value);
 	paused = false;
 	t0 = window.performance.now();
 	animLoop();
@@ -279,7 +282,7 @@ function drawAxes() {
 		if(tickPos[0] < 0) {
 			++numChars;
 		}
-		drawVerticalText(makeGraphMarkers(String(tickPos[0]).slice(0, numChars)), tickPos[0], tickPos[1]+tickLength);
+		drawVerticalText(makeGraphMarkers(String(tickPos[0]).slice(0, numChars), 0), tickPos[0], tickPos[1]+tickLength);
 	}
 	tickPos = [0, 0];
 	while(tickPos[0] < bounds[0][1]) {
@@ -300,7 +303,7 @@ function drawAxes() {
 		if(tickPos[0] < 0) {
 			++numChars;
 		}
-		drawVerticalText(makeGraphMarkers(String(tickPos[0]).slice(0, numChars)), tickPos[0], tickPos[1]+tickLength);
+		drawVerticalText(makeGraphMarkers(String(tickPos[0]).slice(0, numChars), 0), tickPos[0], tickPos[1]+tickLength);
 	}
 	tickPos = [0, 0];
 	while(tickPos[1] > bounds[1][0]) {
@@ -321,7 +324,7 @@ function drawAxes() {
 		if(tickPos[1] < 0) {
 			++numChars;
 		}
-		drawHorizontalText(makeGraphMarkers(String(tickPos[1]).slice(0, numChars)), tickPos[0]+tickLength, -tickPos[1]);
+		drawHorizontalText(makeGraphMarkers(String(tickPos[1]).slice(0, numChars), 1), tickPos[0]+tickLength, -tickPos[1]);
 	}
 	tickPos = [0, 0];
 	while(tickPos[1] < bounds[1][1]) {
@@ -342,10 +345,10 @@ function drawAxes() {
 		if(tickPos[1] < 0) {
 			++numChars;
 		}
-		drawHorizontalText(makeGraphMarkers(String(tickPos[1]).slice(0, numChars)), tickPos[0]+tickLength, -tickPos[1]);
+		drawHorizontalText(makeGraphMarkers(String(tickPos[1]).slice(0, numChars), 1), tickPos[0]+tickLength, -tickPos[1]);
 	}
 }
-function makeGraphMarkers(text) {
+function makeGraphMarkers(text, axis) { //axis is 0 for x, 1 for y
 	var arr = text.split("");
 	var numCommas = 0;
 	if(!(arr[1] == "." || arr[2] == ".")) {
@@ -361,7 +364,7 @@ function makeGraphMarkers(text) {
 		}
 	}
 	if(units != "") {
-		arr.push(" " + units);
+		arr.push(" " + units[axis]);
 	}
 	return arr.join("");
 }
@@ -406,9 +409,7 @@ function animLoop() {
 	dt = t - t0;
 	dt = t - t0;
 	dt = dt / 1000; //Display ms to display s
-	//dt *= timeRate; //Display s to simulated s
-
-	console.log(dt);
+	dt *= timeRate;
 
 	if(dt > 0) {
 		t0 = t;
