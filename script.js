@@ -162,10 +162,16 @@ function updateNumOrgs() {
 				page.orgDataCont.appendChild(singleCont);
 				page.orgDataCont.appendChild(br());
 				page.orgDataCont.appendChild(br());
-				page.orgDataArr.push(document.getElementById("orgData_" + i));
+				page.orgDataArr.push({});
+				page.orgDataArr[i].cont = document.getElementById("orgData_" + i);
+				page.orgDataArr[i].name = document.getElementById("orgData_" + i + "_NAME");
+				page.orgDataArr[i].predlist = document.getElementById("orgData_" + i + "_PREDLIST");
+				page.orgDataArr[i].predconst = document.getElementById("orgData_" + i + "_PREDCONST");
+				page.orgDataArr[i].preylist = document.getElementById("orgData_" + i + "_PREYLIST");
+				page.orgDataArr[i].preyconst = document.getElementById("orgData_" + i + "_PREYCONST");
 			}
 			page.orgDataCont.style.display = "inline-block";
-			page.orgDataArr[0].childNodes[1].firstChild.focus();
+			page.orgDataArr[0].name.focus();
 		}
 		else {
 			hideOrgDataInput();
