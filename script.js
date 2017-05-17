@@ -20,10 +20,19 @@ var overCanvas; //Whether or not the cursor is over the canvas.
 var pos = []; //The position on the graph of the location of the center of the graph window.
 var zoom; //The zoom level of the graph display.
 var paused; //The pause/resume state of the simulation.
+var orgData = [];
 
 //------------------------------------------------------------
 // Classes
 //------------------------------------------------------------
+
+function Organism(name, pred, predC, prey, preyC) {
+	this.name = name;
+	this.predlist = pred;
+	this.predconst = predC;
+	this.preylist = prey;
+	this.preyconst = preyC;
+}
 
 //------------------------------------------------------------
 // Functions
@@ -183,6 +192,19 @@ function updateNumOrgs() {
 		page.numOrgs.focus();
 	}
 }
+function getOrgInput() {
+	console.log("FUNCTION CALL: getOrgInput()");
+
+	orgData = [];
+	for(var i=0; i<page.orgDataArr.length; ++i) {
+		var n = page.orgDataArr[i].name.value;
+		var pred = page.orgDataArr[i].predlist.value.split(",");
+		var predConst = page.orgDataArr[i].predconst.value.split(",");
+		var prey = page.orgDataArr[i].preylist.value.split(",");
+		var preyConst = page.orgDataArr[i].preyconst.value.split(",");
+		orgData.push(new Organism(n, pred, predConst, prey, preyConst));
+	}
+}
 function hideOrgDataInput() {
 	console.log("FUNCTION CALL: hideOrgDataInput()");
 
@@ -195,6 +217,8 @@ function br() {
 function startSimulation() {
 	console.log("FUNCTION CALL: startSimulation()");
 	
+	getOrgInput();
+
 	paused = false;
 }
 
