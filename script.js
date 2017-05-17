@@ -2,10 +2,15 @@
 // Constants
 //------------------------------------------------------------
 
-var defaultZoom = 1; //The default zoom level. Zoom is given in pixels per graph unit. The graph is done in units of years and number of organisms.
+var defaultZoom = 2; //The default zoom level. Zoom is given in pixels per graph unit. The graph is done in units of years and number of organisms.
 var dragPanningConstant = 1/defaultZoom; //This constant slows down the rate that dragging pans the graph.
 var zoomPowerConstant = 1.1; //This is the exponent that zooming in and out uses.
 var mouseWheelCalibrationConstant = 53; //The e.deltaY value when you scroll my personal mouse one notch. Other mice may be different.
+var axisColors = [["#000000", "#000000"], ["#000000", "#000000"]]; //The colors for the axes. [[x-, x+], [y-, y+]]
+var graphTickLength = 10; //How tall the tick marks are on the graph.
+var drawGridlines = true;
+var gridlinesColor = "#eeeeee";
+var units = "";
 
 //------------------------------------------------------------
 // Global Variables
@@ -17,10 +22,12 @@ var mouseLocation = []; //Used for the mouseMoved function. This is the current 
 var oldMouseLocation = []; //And this is the previous mouse position.
 var mouseButtons = {}; //An object containing the states of mouse buttons.
 var overCanvas; //Whether or not the cursor is over the canvas.
-var pos = []; //The position on the graph of the location of the center of the graph window.
-var zoom; //The zoom level of the graph display.
+var pos = [0, 0]; //The position on the graph of the location of the center of the graph window.
+var zoom = defaultZoom; //The zoom level of the graph display.
 var paused; //The pause/resume state of the simulation.
-var orgData = [];
+var orgData = []; //List of organisms' data.
+var t0; //Used in time difference calculations for animation speed.
+var dt; //Used in time difference calculations for animation speed.
 
 //------------------------------------------------------------
 // Classes
@@ -83,7 +90,7 @@ function mouseMoved(e) {
 		pos[1] += delta[1] * dragPanningConstant * defaultZoom * (1/zoom);
 	}
 }
-function mouseDown(e) {
+function mousedown(e) {
 	//
 	mouseButtons[String(event.which)] = true;
 }
@@ -218,8 +225,199 @@ function startSimulation() {
 	console.log("FUNCTION CALL: startSimulation()");
 	
 	getOrgInput();
-
 	paused = false;
+	t0 = window.performance.now();
+	animLoop();
+}
+function drawAxes() {
+	var w = page.canvas.width/zoom;
+	var w0 = pos[0];
+	var h = page.canvas.height/zoom;
+	var h0 = pos[1];
+
+	var bounds = [[(-w/2)+w0, (w/2)+w0], [(-h/2)+h0, (h/2)+h0]]; //[[xmin, xmax], [ymin, ymax]];
+
+	ctx.strokeStyle = axisColors[0][0]; //x-
+	ctx.moveTo(0, 0);
+	ctx.lineTo(bounds[0][0], 0);
+	ctx.stroke(); ctx.beginPath();
+	ctx.strokeStyle = axisColors[0][1]; //x+
+	ctx.moveTo(0, 0);
+	ctx.lineTo(bounds[0][1], 0);
+	ctx.stroke(); ctx.beginPath();
+	ctx.strokeStyle = axisColors[1][0]; //y-
+	ctx.moveTo(0, 0);
+	ctx.lineTo(0, bounds[1][0]);
+	ctx.stroke(); ctx.beginPath();
+	ctx.strokeStyle = axisColors[1][1]; //y+
+	ctx.moveTo(0, 0);
+	ctx.lineTo(0, bounds[1][1]);
+	ctx.stroke(); ctx.beginPath();
+
+	ctx.strokeStyle = "#000000";
+
+	var intervalMagnitude = Math.floor(Math.log10(w));
+	var interval = Math.pow(10, intervalMagnitude-1);
+	var tickLength = graphTickLength/zoom;
+	var tickPos = [0, 0];
+	var numChars;
+	while(tickPos[0] > bounds[0][0]) {
+		tickPos[0] -= interval;
+		if(drawGridlines) {
+			ctx.beginPath();
+			ctx.strokeStyle = gridlinesColor;
+			ctx.moveTo(tickPos[0], bounds[1][0]);
+			ctx.lineTo(tickPos[0], bounds[1][1]);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.strokeStyle = "#000000";
+		}
+		ctx.moveTo(tickPos[0], tickPos[1]+(tickLength/2));
+		ctx.lineTo(tickPos[0], tickPos[1]-(tickLength/2));
+		ctx.stroke();
+		numChars = 2+Math.floor(Math.abs(Math.log10(interval)));
+		if(tickPos[0] < 0) {
+			++numChars;
+		}
+		drawVerticalText(makeGraphMarkers(String(tickPos[0]).slice(0, numChars)), tickPos[0], tickPos[1]+tickLength);
+	}
+	tickPos = [0, 0];
+	while(tickPos[0] < bounds[0][1]) {
+		tickPos[0] += interval;
+		if(drawGridlines) {
+			ctx.beginPath();
+			ctx.strokeStyle = gridlinesColor;
+			ctx.moveTo(tickPos[0], bounds[1][0]);
+			ctx.lineTo(tickPos[0], bounds[1][1]);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.strokeStyle = "#000000";
+		}
+		ctx.moveTo(tickPos[0], tickPos[1]+(tickLength/2));
+		ctx.lineTo(tickPos[0], tickPos[1]-(tickLength/2));
+		ctx.stroke();
+		numChars = 2+Math.floor(Math.abs(Math.log10(interval)));
+		if(tickPos[0] < 0) {
+			++numChars;
+		}
+		drawVerticalText(makeGraphMarkers(String(tickPos[0]).slice(0, numChars)), tickPos[0], tickPos[1]+tickLength);
+	}
+	tickPos = [0, 0];
+	while(tickPos[1] > bounds[1][0]) {
+		tickPos[1] -= interval;
+		if(drawGridlines) {
+			ctx.beginPath();
+			ctx.strokeStyle = gridlinesColor;
+			ctx.moveTo(bounds[0][0], tickPos[1]);
+			ctx.lineTo(bounds[0][1], tickPos[1]);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.strokeStyle = "#000000";
+		}
+		ctx.moveTo(tickPos[0]+(tickLength/2), tickPos[1]);
+		ctx.lineTo(tickPos[0]-(tickLength/2), tickPos[1]);
+		ctx.stroke();
+		numChars = 2+Math.floor(Math.abs(Math.log10(interval)));
+		if(tickPos[1] < 0) {
+			++numChars;
+		}
+		drawHorizontalText(makeGraphMarkers(String(tickPos[1]).slice(0, numChars)), tickPos[0]+tickLength, -tickPos[1]);
+	}
+	tickPos = [0, 0];
+	while(tickPos[1] < bounds[1][1]) {
+		tickPos[1] += interval;
+		if(drawGridlines) {
+			ctx.beginPath();
+			ctx.strokeStyle = gridlinesColor;
+			ctx.moveTo(bounds[0][0], tickPos[1]);
+			ctx.lineTo(bounds[0][1], tickPos[1]);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.strokeStyle = "#000000";
+		}
+		ctx.moveTo(tickPos[0]+(tickLength/2), tickPos[1]);
+		ctx.lineTo(tickPos[0]-(tickLength/2), tickPos[1]);
+		ctx.stroke();
+		numChars = 2+Math.floor(Math.abs(Math.log10(interval)));
+		if(tickPos[1] < 0) {
+			++numChars;
+		}
+		drawHorizontalText(makeGraphMarkers(String(tickPos[1]).slice(0, numChars)), tickPos[0]+tickLength, -tickPos[1]);
+	}
+}
+function makeGraphMarkers(text) {
+	var arr = text.split("");
+	var numCommas = 0;
+	if(!(arr[1] == "." || arr[2] == ".")) {
+		for(var i=arr.length-1; i>0; --i) {
+			if(arr[i-1] == "-") {
+				break;
+			}
+			else if(((arr.length-i)-numCommas) % 3 == 0) {
+				arr.splice(i, 0, ",");
+				++numCommas;
+				--i;
+			}
+		}
+	}
+	if(units != "") {
+		arr.push(" " + units);
+	}
+	return arr.join("");
+}
+function drawHorizontalText(text, x, y) {
+	ctx.save();
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
+	ctx.transform(1, 0, 0, 1, page.canvas.width/2, page.canvas.height/2); //Put 0,0 in the center of the canvas
+	ctx.transform(zoom, 0, 0, zoom, 0, 0); //Scale the canvas
+	ctx.transform(1, 0, 0, 1, -pos[0], pos[1]);
+	ctx.transform(1, 0, 0, 1, x, y);
+	ctx.transform(1/zoom, 0, 0, 1/zoom, 0, 0);
+	ctx.fillText(text, 0, 3);
+	ctx.restore();
+}
+function drawVerticalText(text, x, y) {
+	ctx.save();
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
+	ctx.transform(1, 0, 0, 1, page.canvas.width/2, page.canvas.height/2); //Put 0,0 in the center of the canvas
+	ctx.transform(zoom, 0, 0, zoom, 0, 0); //Scale the canvas
+	ctx.transform(1, 0, 0, 1, -pos[0], pos[1]);
+	ctx.transform(1, 0, 0, 1, x, y);
+	ctx.transform(1/zoom, 0, 0, 1/zoom, 0, 0);
+	ctx.transform(0, 1, -1, 0, 0, 0);
+	ctx.fillText(text, 0, 3);
+	ctx.restore();
+}
+function clearAndResetCanvas() {
+	//console.log("FUNCTION CALL: clearAndResetCanvas()");
+
+	ctx.setTransform(1, 0, 0, 1, 0, 0); //Reset all context transforms
+	ctx.clearRect(0, 0, page.canvas.width, page.canvas.height); //Clear the entire canvas
+	ctx.beginPath(); //Start a new line path.
+	ctx.transform(1, 0, 0, 1, page.canvas.width/2, page.canvas.height/2); //Put 0,0 in the center of the canvas
+	ctx.transform(zoom, 0, 0, zoom, 0, 0); //Scale the canvas
+	ctx.transform(1, 0, 0, -1, 0, 0); //Flip the canvas vertically.
+	ctx.lineWidth = 1/zoom; //Keep the lines the same thickness.
+	ctx.font = "10px";
+	ctx.transform(1, 0, 0, 1, -pos[0], -pos[1]);
+}
+function animLoop() {
+	var t = window.performance.now();
+	dt = t - t0;
+	dt = t - t0;
+	dt = dt / 1000; //Display ms to display s
+	//dt *= timeRate; //Display s to simulated s
+
+	console.log(dt);
+
+	if(dt > 0) {
+		t0 = t;
+
+		clearAndResetCanvas();
+		drawAxes();
+	}
+
+	requestAnimationFrame(animLoop);
 }
 
 //------------------------------------------------------------
