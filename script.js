@@ -30,6 +30,7 @@ var orgData = []; //List of organisms' data.
 var t0; //Used in time difference calculations for animation speed.
 var dt; //Used in time difference calculations for animation speed.
 var timeRate = defaultTimeRate; //The amount of simulation time which passes per second.
+var popRecord = []; //A list of population history values for each organism. Indexed by organism, then time.
 
 //------------------------------------------------------------
 // Classes
@@ -37,10 +38,10 @@ var timeRate = defaultTimeRate; //The amount of simulation time which passes per
 
 function Organism(name, pred, predC, prey, preyC) {
 	this.name = name;
-	this.predlist = pred;
-	this.predconst = predC;
-	this.preylist = prey;
-	this.preyconst = preyC;
+	this.predlist = parseArrayToNums(pred);
+	this.predconst = parseArrayToNums(predC);
+	this.preylist = parseArrayToNums(prey);
+	this.preyconst = parseArrayToNums(preyC);
 }
 
 //------------------------------------------------------------
@@ -213,6 +214,12 @@ function getOrgInput() {
 		var preyConst = page.orgDataArr[i].preyconst.value.split(",");
 		orgData.push(new Organism(n, pred, predConst, prey, preyConst));
 	}
+}
+function parseArrayToNums(arr) {
+	for(var i=0; i<arr.length; ++i) {
+		arr[i] = Number(arr[i]);
+	}
+	return arr;
 }
 function hideOrgDataInput() {
 	console.log("FUNCTION CALL: hideOrgDataInput()");
@@ -404,6 +411,12 @@ function clearAndResetCanvas() {
 	ctx.font = "10px";
 	ctx.transform(1, 0, 0, 1, -pos[0], -pos[1]);
 }
+function updatePop() {
+	//
+}
+function drawPop() {
+	//
+}
 function animLoop() {
 	var t = window.performance.now();
 	dt = t - t0;
@@ -414,8 +427,10 @@ function animLoop() {
 	if(dt > 0) {
 		t0 = t;
 
+		updatePop();
 		clearAndResetCanvas();
 		drawAxes();
+		drawPop();
 	}
 
 	requestAnimationFrame(animLoop);
