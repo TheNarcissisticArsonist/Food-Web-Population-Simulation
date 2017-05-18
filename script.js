@@ -39,13 +39,27 @@ var popRecord = []; //A list of population history values for each organism. Ind
 function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 	this.name = name;
 	this.id = id;
-	this.predList = parseArrayToNums(pred);
+	this.predList = parseArrayToNums(pred); //List of organisms that are predators to this organism.
 	this.predConst = parseArrayToNums(predC);
-	this.preyList = parseArrayToNums(prey);
+	this.preyList = parseArrayToNums(prey); //List of organisms that are prey to this organism.
 	this.preyConst = parseArrayToNums(preyC);
 	this.loneConst = Number(loneConst); //The population rate of change in the complete absence of other organisms.
 	                                    //For a producer, this is positive. For a consumer, this is negative.
 	this.currentPop = Number(startPop);
+
+	this.dPdt = function(orgList) {
+		var dP = 0;
+		
+		for(var i=0; i<this.preyList.length; ++i) {
+			dP += this.preyConst[i] * orgList[preyList[i]].currentPop * this.currentPop;
+		}
+		for(var i=0; i<this.predList.length; ++i) {
+			dP -= this.predConst[i] * orgList[predList[i]].currentPop * this.currentPop;
+		}
+		dP += this.loneConst * this.currentPop;
+
+		return dP;
+	}
 }
 
 //------------------------------------------------------------
