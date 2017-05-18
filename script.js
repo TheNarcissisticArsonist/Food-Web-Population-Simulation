@@ -36,14 +36,14 @@ var popRecord = []; //A list of population history values for each organism. Ind
 // Classes
 //------------------------------------------------------------
 
-function Organism(name, id, pred, predC, prey, preyC, loneconst) {
+function Organism(name, id, pred, predC, prey, preyC, loneConst) {
 	this.name = name;
 	this.id = id;
-	this.predlist = parseArrayToNums(pred);
-	this.predconst = parseArrayToNums(predC);
-	this.preylist = parseArrayToNums(prey);
-	this.preyconst = parseArrayToNums(preyC);
-	this.loneconst = Number(loneconst); //The population rate of change in the complete absence of other organisms.
+	this.predList = parseArrayToNums(pred);
+	this.predConst = parseArrayToNums(predC);
+	this.preyList = parseArrayToNums(prey);
+	this.preyConst = parseArrayToNums(preyC);
+	this.loneConst = Number(loneConst); //The population rate of change in the complete absence of other organisms.
 	                                    //For a producer, this is positive. For a consumer, this is negative.
 }
 
@@ -191,11 +191,11 @@ function updateNumOrgs() {
 				page.orgDataArr.push({});
 				page.orgDataArr[i].cont = document.getElementById("orgData_" + i);
 				page.orgDataArr[i].name = document.getElementById("orgData_" + i + "_NAME");
-				page.orgDataArr[i].predlist = document.getElementById("orgData_" + i + "_PREDLIST");
-				page.orgDataArr[i].predconst = document.getElementById("orgData_" + i + "_PREDCONST");
-				page.orgDataArr[i].preylist = document.getElementById("orgData_" + i + "_PREYLIST");
-				page.orgDataArr[i].preyconst = document.getElementById("orgData_" + i + "_PREYCONST");
-				page.orgDataArr[i].loneconst = document.getElementById("orgData_" + i + "_LONECONST");
+				page.orgDataArr[i].predList = document.getElementById("orgData_" + i + "_PREDLIST");
+				page.orgDataArr[i].predConst = document.getElementById("orgData_" + i + "_PREDCONST");
+				page.orgDataArr[i].preyList = document.getElementById("orgData_" + i + "_PREYLIST");
+				page.orgDataArr[i].preyConst = document.getElementById("orgData_" + i + "_PREYCONST");
+				page.orgDataArr[i].loneConst = document.getElementById("orgData_" + i + "_LONECONST");
 			}
 			page.orgDataCont.style.display = "inline-block";
 			page.orgDataArr[0].name.focus();
@@ -216,11 +216,11 @@ function getOrgInput() {
 	orgData = [];
 	for(var i=0; i<page.orgDataArr.length; ++i) {
 		var name = page.orgDataArr[i].name.value;
-		var pred = page.orgDataArr[i].predlist.value.split(",");
-		var predConst = page.orgDataArr[i].predconst.value.split(",");
-		var prey = page.orgDataArr[i].preylist.value.split(",");
-		var preyConst = page.orgDataArr[i].preyconst.value.split(",");
-		var loneConst = page.orgDataArr[i].loneconst.value;
+		var pred = page.orgDataArr[i].predList.value.split(",");
+		var predConst = page.orgDataArr[i].predConst.value.split(",");
+		var prey = page.orgDataArr[i].preyList.value.split(",");
+		var preyConst = page.orgDataArr[i].preyConst.value.split(",");
+		var loneConst = page.orgDataArr[i].loneConst.value;
 		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst));
 	}
 }
