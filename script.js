@@ -36,7 +36,7 @@ var popRecord = []; //A list of population history values for each organism. Ind
 // Classes
 //------------------------------------------------------------
 
-function Organism(name, id, pred, predC, prey, preyC, loneConst) {
+function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 	this.name = name;
 	this.id = id;
 	this.predList = parseArrayToNums(pred);
@@ -45,6 +45,7 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst) {
 	this.preyConst = parseArrayToNums(preyC);
 	this.loneConst = Number(loneConst); //The population rate of change in the complete absence of other organisms.
 	                                    //For a producer, this is positive. For a consumer, this is negative.
+	this.currentPop = Number(startPop);
 }
 
 //------------------------------------------------------------
@@ -159,6 +160,8 @@ function updateNumOrgs() {
 				preyConstLabel.appendChild(document.createTextNode("Constants: "));
 				var loneConstLabel = document.createElement("pre");
 				loneConstLabel.appendChild(document.createTextNode("Lone Rate: "));
+				var startPopLabel = document.createElement("pre");
+				startPopLabel.appendChild(document.createTextNode("Starting Population: "));
 
 
 				var nameInput = document.createElement("textarea");
@@ -173,9 +176,13 @@ function updateNumOrgs() {
 				preyConstInput.setAttribute("id", "orgData_" + i + "_PREYCONST");
 				var loneConstInput = document.createElement("textarea");
 				loneConstInput.setAttribute("id", "orgData_" + i + "_LONECONST");
+				var startPopInput = document.createElement("textarea");
+				startPopInput.setAttribute("id", "orgData_" + i + "_STARTPOP");
 
-				var leftElementsList = [nameLabel, br(), predListLabel, br(), predConstLabel, br(), preyListLabel, br(), preyConstLabel, br(), loneConstLabel, br()];
-				var rightElementsList = [nameInput, br(), predListInput, br(), predConstInput, br(), preyListInput, br(), preyConstInput, br(), loneConstInput, br()];
+				var leftElementsList = [nameLabel, br(), predListLabel, br(), predConstLabel, br(), preyListLabel, br(), preyConstLabel, br(),
+					loneConstLabel, br(), startPopLabel, br()];
+				var rightElementsList = [nameInput, br(), predListInput, br(), predConstInput, br(), preyListInput, br(), preyConstInput, br(),
+					loneConstInput, br(), startPopInput, br()];
 
 				for(var j=0; j<leftElementsList.length; ++j) {
 					leftCont.appendChild(leftElementsList[j]);
@@ -196,6 +203,7 @@ function updateNumOrgs() {
 				page.orgDataArr[i].preyList = document.getElementById("orgData_" + i + "_PREYLIST");
 				page.orgDataArr[i].preyConst = document.getElementById("orgData_" + i + "_PREYCONST");
 				page.orgDataArr[i].loneConst = document.getElementById("orgData_" + i + "_LONECONST");
+				page.orgDataArr[i].startPop = document.getElementById("orgData_" + i + "_STARTPOP");
 			}
 			page.orgDataCont.style.display = "inline-block";
 			page.orgDataArr[0].name.focus();
@@ -221,7 +229,8 @@ function getOrgInput() {
 		var prey = page.orgDataArr[i].preyList.value.split(",");
 		var preyConst = page.orgDataArr[i].preyConst.value.split(",");
 		var loneConst = page.orgDataArr[i].loneConst.value;
-		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst));
+		var startPop = page.orgDataArr[i].startPop.valeu;
+		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst, startPop));
 	}
 }
 function parseArrayToNums(arr) {
