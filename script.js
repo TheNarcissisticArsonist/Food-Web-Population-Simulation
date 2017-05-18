@@ -36,14 +36,15 @@ var popRecord = []; //A list of population history values for each organism. Ind
 // Classes
 //------------------------------------------------------------
 
-function Organism(name, pred, predC, prey, preyC, loneconst) {
+function Organism(name, id, pred, predC, prey, preyC, loneconst) {
 	this.name = name;
+	this.id = id;
 	this.predlist = parseArrayToNums(pred);
 	this.predconst = parseArrayToNums(predC);
 	this.preylist = parseArrayToNums(prey);
 	this.preyconst = parseArrayToNums(preyC);
-	this.loneconst = loneconst; //The population rate of change in the complete absence of other organisms.
-	                            //For a producer, this is positive. For a consumer, this is negative.
+	this.loneconst = Number(loneconst); //The population rate of change in the complete absence of other organisms.
+	                                    //For a producer, this is positive. For a consumer, this is negative.
 }
 
 //------------------------------------------------------------
@@ -214,12 +215,13 @@ function getOrgInput() {
 
 	orgData = [];
 	for(var i=0; i<page.orgDataArr.length; ++i) {
-		var n = page.orgDataArr[i].name.value;
+		var name = page.orgDataArr[i].name.value;
 		var pred = page.orgDataArr[i].predlist.value.split(",");
 		var predConst = page.orgDataArr[i].predconst.value.split(",");
 		var prey = page.orgDataArr[i].preylist.value.split(",");
 		var preyConst = page.orgDataArr[i].preyconst.value.split(",");
-		orgData.push(new Organism(n, pred, predConst, prey, preyConst));
+		var loneConst = page.orgDataArr[i].loneconst.value;
+		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst));
 	}
 }
 function parseArrayToNums(arr) {
