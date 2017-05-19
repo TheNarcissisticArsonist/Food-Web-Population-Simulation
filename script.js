@@ -47,7 +47,7 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 	                                    //For a producer, this is positive. For a consumer, this is negative.
 	this.currentPop = Number(startPop);
 
-	this.dPdt = function(orgList) {
+	this.dPdt = function(orgList, dt) {
 		var dP = 0;
 		
 		for(var i=0; i<this.preyList.length; ++i) {
@@ -58,7 +58,7 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 		}
 		dP += this.loneConst * this.currentPop;
 
-		return dP;
+		return dP*dt;
 	}
 	this.addPop = function(num) {
 		this.currentPop += num;
@@ -249,6 +249,9 @@ function getOrgInput() {
 		var loneConst = page.orgDataArr[i].loneConst.value;
 		var startPop = page.orgDataArr[i].startPop.value;
 		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst, loneConst, startPop));
+
+		popRecord.push([]);
+		popRecord[i].push(orgData[i].currentPop);
 	}
 }
 function parseArrayToNums(arr) {
@@ -447,8 +450,18 @@ function clearAndResetCanvas() {
 	ctx.font = "10px";
 	ctx.transform(1, 0, 0, 1, -pos[0], -pos[1]);
 }
-function updatePop() {
-	//
+function updatePop(dt) {
+	var dPop = [];
+	for(var i=0; i<orgData.length; ++i) {
+		dPop[i] = orgData[i].dPdt(orgData, dt);
+		if(dPop[i] <= 0) {
+			dPop[i] = 0;
+		}
+	}
+	for(var i=0; i<orgData.length; ++i) {
+		orgData[i].addPop(dPop[i]);
+		popRecord[i].push(orgData[i].currentPop);
+	}
 }
 function drawPop() {
 	//
@@ -457,13 +470,13 @@ function animLoop() {
 	var t = window.performance.now();
 	dt = t - t0;
 	dt = t - t0;
-	dt = dt / 1000; //Display ms to display s
+	dt = dt / 1000000; //Display us to display s
 	dt *= timeRate;
 
 	if(dt > 0) {
 		t0 = t;
 
-		updatePop();
+		updatePop(dt);
 		clearAndResetCanvas();
 		drawAxes();
 		drawPop();
