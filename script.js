@@ -51,16 +51,16 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 		var dP = 0;
 		
 		for(var i=0; i<this.preyList.length; ++i) {
-			dP += this.preyConst[i] * orgList[preyList[i]].currentPop * this.currentPop;
+			dP += this.preyConst[i] * orgList[this.preyList[i]].currentPop * this.currentPop;
 		}
 		for(var i=0; i<this.predList.length; ++i) {
-			dP -= this.predConst[i] * orgList[predList[i]].currentPop * this.currentPop;
+			dP -= this.predConst[i] * orgList[this.predList[i]].currentPop * this.currentPop;
 		}
 		dP += this.loneConst * this.currentPop;
 
 		return dP;
 	}
-	this.addPop(num) {
+	this.addPop = function(num) {
 		this.currentPop += num;
 		return this.currentPop;
 	}
@@ -173,7 +173,7 @@ function updateNumOrgs() {
 				var predConstLabel = document.createElement("pre");
 				predConstLabel.appendChild(document.createTextNode("Constants: "));
 				var preyListLabel = document.createElement("pre");
-				preyListLabel.appendChild(document.createTextNode("Prey: "));
+				preyListLabel.appendChild(document.createTextNode(i + "\t\t" + "Prey: "));
 				var preyConstLabel = document.createElement("pre");
 				preyConstLabel.appendChild(document.createTextNode("Constants: "));
 				var loneConstLabel = document.createElement("pre");
@@ -247,8 +247,8 @@ function getOrgInput() {
 		var prey = page.orgDataArr[i].preyList.value.split(",");
 		var preyConst = page.orgDataArr[i].preyConst.value.split(",");
 		var loneConst = page.orgDataArr[i].loneConst.value;
-		var startPop = page.orgDataArr[i].startPop.valeu;
-		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst, startPop));
+		var startPop = page.orgDataArr[i].startPop.value;
+		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst, loneConst, startPop));
 	}
 }
 function parseArrayToNums(arr) {
