@@ -11,7 +11,9 @@ var graphTickLength = 10; //How tall the tick marks are on the graph.
 var drawGridlines = true;
 var gridlinesColor = "#eeeeee";
 var units = ["years", ""];
-var defaultTimeRate = 60*60*24*7; //1 week per second.
+var defaultTimeRate = 60*60*24*365; //1 year per second.
+var minDT = 0.05; //At least 0.05 s (50 ms) per simulation step.
+var oneYear = 60*60*24*365; //Seconds in a year.
 
 //------------------------------------------------------------
 // Global Variables
@@ -48,7 +50,7 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 	                                    //For a producer, this is positive. For a consumer, this is negative.
 	this.currentPop = Number(startPop);
 
-	var rawColNum = Math.floor(Math.random() * 16777216);
+	var rawColNum = Math.floor(Math.random() * parseInt("0xFFFFFF"));
 	this.color = "#" + String(rawColNum.toString(16));
 	console.log(this.color);
 
@@ -281,7 +283,7 @@ function startSimulation() {
 	timeRate = Number(page.speedMult.value);
 	paused = false;
 	t0 = window.performance.now();
-	startTime = t0;
+	startTime = t0 / 1000; //In seconds
 	animLoop();
 }
 function drawAxes() {
@@ -457,6 +459,10 @@ function clearAndResetCanvas() {
 	ctx.transform(1, 0, 0, 1, -pos[0], -pos[1]);
 }
 function updatePop(dt, t) {
+	var timeElapsed = t - startTime;
+	timeElapsed *= timeRate/oneYear;
+	dt *= timeRate/oneYear;
+	t *= timeRate/oneYear;
 	var dPop = [];
 	for(var i=0; i<orgData.length; ++i) {
 		dPop[i] = orgData[i].dPdt(orgData, dt);
@@ -489,12 +495,11 @@ function drawPop() {
 function animLoop() {
 	var t = window.performance.now();
 	dt = t - t0;
-	dt = t - t0;
-	dt = dt / 1000000; //Display us to display s
-	dt *= timeRate;
+	dt = dt / 1000; //Display us to display s
 
-	if(dt > 0) {
+	if(dt > minDT) {
 		t0 = t;
+		t = t /1000; //t is now in s instead of ms
 
 		updatePop(dt, t);
 		clearAndResetCanvas();
