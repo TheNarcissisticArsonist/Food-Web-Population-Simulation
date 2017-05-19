@@ -60,6 +60,10 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 
 		return dP;
 	}
+	this.addPop(num) {
+		this.currentPop += num;
+		return this.currentPop;
+	}
 }
 
 //------------------------------------------------------------
