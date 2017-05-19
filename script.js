@@ -31,6 +31,7 @@ var t0; //Used in time difference calculations for animation speed.
 var dt; //Used in time difference calculations for animation speed.
 var timeRate = defaultTimeRate; //The amount of simulation time which passes per second.
 var popRecord = []; //A list of population history values for each organism. Indexed by organism, then time.
+var startTime; //The original time the simulation started.
 
 //------------------------------------------------------------
 // Classes
@@ -255,7 +256,7 @@ function getOrgInput() {
 		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst, loneConst, startPop));
 
 		popRecord.push([]);
-		popRecord[i].push(orgData[i].currentPop);
+		popRecord[i].push([0, orgData[i].currentPop]);
 	}
 }
 function parseArrayToNums(arr) {
@@ -280,6 +281,7 @@ function startSimulation() {
 	timeRate = Number(page.speedMult.value);
 	paused = false;
 	t0 = window.performance.now();
+	startTime = t0;
 	animLoop();
 }
 function drawAxes() {
@@ -454,7 +456,7 @@ function clearAndResetCanvas() {
 	ctx.font = "10px";
 	ctx.transform(1, 0, 0, 1, -pos[0], -pos[1]);
 }
-function updatePop(dt) {
+function updatePop(dt, t) {
 	var dPop = [];
 	for(var i=0; i<orgData.length; ++i) {
 		dPop[i] = orgData[i].dPdt(orgData, dt);
@@ -464,11 +466,25 @@ function updatePop(dt) {
 	}
 	for(var i=0; i<orgData.length; ++i) {
 		orgData[i].addPop(dPop[i]);
-		popRecord[i].push(orgData[i].currentPop);
+		popRecord[i].push([t-startTime, orgData[i].currentPop]);
 	}
 }
 function drawPop() {
-	
+	for(var i=0; i<orgData.length; ++i) {
+		if(popRecord[i].length < 2) {
+			break;
+		}
+
+		ctx.strokeStyle = orgData[i].color;
+		ctx.beginPath();
+		ctx.moveTo(popRecord[i][0][0], popRecord[i][0][1]);
+
+		for(var j=0; j<popRecord[i].length; ++j) {
+			ctx.lineTo(popRecord[i][j][0], popRecord[i][j][1]);
+			ctx.stroke();
+		}
+	}
+	ctx.strokeStyle = "#000000";
 }
 function animLoop() {
 	var t = window.performance.now();
@@ -480,7 +496,7 @@ function animLoop() {
 	if(dt > 0) {
 		t0 = t;
 
-		updatePop(dt);
+		updatePop(dt, t);
 		clearAndResetCanvas();
 		drawAxes();
 		drawPop();
