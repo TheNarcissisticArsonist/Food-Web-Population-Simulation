@@ -53,6 +53,7 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 	var rawColNum = Math.floor(Math.random() * parseInt("0xFFFFFF"));
 	this.color = "#" + String(rawColNum.toString(16));
 	console.log(this.color);
+	page.orgDataArr[this.id].cont.style.backgroundColor = this.color;
 
 	this.dPdt = function(orgList, dt) {
 		var dP = 0;
