@@ -34,6 +34,7 @@ var dt; //Used in time difference calculations for animation speed.
 var timeRate = defaultTimeRate; //The amount of simulation time which passes per second.
 var popRecord = []; //A list of population history values for each organism. Indexed by organism, then time.
 var startTime; //The original time the simulation started.
+var loopRunning = false; //Whether or not the simulation/animation loop is running.
 
 //------------------------------------------------------------
 // Classes
@@ -292,7 +293,10 @@ function startSimulation() {
 	paused = false;
 	t0 = window.performance.now();
 	startTime = t0 / 1000; //In seconds
-	animLoop();
+	if(!loopRunning) {
+		loopRunning = true;
+		animLoop();
+	}
 }
 function drawAxes() {
 	var w = page.canvas.width/zoom;
