@@ -262,6 +262,9 @@ function getOrgInput() {
 	}
 }
 function parseArrayToNums(arr) {
+	if(arr[0] == "") {
+		return [];
+	}
 	for(var i=0; i<arr.length; ++i) {
 		arr[i] = Number(arr[i]);
 	}
@@ -473,6 +476,7 @@ function updatePop(dt, t) {
 	for(var i=0; i<orgData.length; ++i) {
 		orgData[i].addPop(dPop[i]);
 		popRecord[i].push([t-startTime, orgData[i].currentPop]);
+		console.log(popRecord[0][i][0] + " " + popRecord[0][i][1]);
 	}
 }
 function drawPop() {
