@@ -40,7 +40,7 @@ var loopRunning = false; //Whether or not the simulation/animation loop is runni
 // Classes
 //------------------------------------------------------------
 
-function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
+function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop, carryingCapacity) {
 	this.name = name;
 	this.id = id;
 	this.predList = parseArrayToNums(pred); //List of organisms that are predators to this organism.
@@ -56,6 +56,11 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 	console.log(this.color);
 	page.orgDataArr[this.id].cont.style.backgroundColor = this.color;
 
+	this.producer = (this.preyList.length == 0);
+	if(this.producer) {
+		this.carryingCapacity = carryingCapacity;
+	}
+
 	this.dPdt = function(orgList, dt) {
 		var dP = 0;
 		
@@ -66,6 +71,9 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 			dP -= this.predConst[i] * orgList[this.predList[i]].currentPop * this.currentPop;
 		}
 		dP += this.loneConst * this.currentPop;
+		if(this.producer) {
+			dP -= this.loneConst * Math.pow(this.currentPop, 2) * (1/this.carryingCapacity);
+		}
 
 		return dP*dt;
 	}
@@ -192,6 +200,8 @@ function updateNumOrgs() {
 				loneConstLabel.appendChild(document.createTextNode("Lone Rate: "));
 				var startPopLabel = document.createElement("pre");
 				startPopLabel.appendChild(document.createTextNode("Starting Population: "));
+				var carryCapLabel = document.createElement("pre");
+				carryCapLabel.appendChild(document.createTextNode("Carrying Capacity: "));
 
 
 				var nameInput = document.createElement("textarea");
@@ -208,11 +218,13 @@ function updateNumOrgs() {
 				loneConstInput.setAttribute("id", "orgData_" + i + "_LONECONST");
 				var startPopInput = document.createElement("textarea");
 				startPopInput.setAttribute("id", "orgData_" + i + "_STARTPOP");
+				var carryCapInput = document.createElement("textarea");
+				carryCapInput.setAttribute("id", "orgData_" + i + "_CARRYCAP");
 
 				var leftElementsList = [nameLabel, br(), predListLabel, br(), predConstLabel, br(), preyListLabel, br(), preyConstLabel, br(),
-					loneConstLabel, br(), startPopLabel, br()];
+					loneConstLabel, br(), startPopLabel, br(), carryCapLabel, br()];
 				var rightElementsList = [nameInput, br(), predListInput, br(), predConstInput, br(), preyListInput, br(), preyConstInput, br(),
-					loneConstInput, br(), startPopInput, br()];
+					loneConstInput, br(), startPopInput, br(), carryCapInput, br()];
 
 				for(var j=0; j<leftElementsList.length; ++j) {
 					leftCont.appendChild(leftElementsList[j]);
@@ -234,6 +246,7 @@ function updateNumOrgs() {
 				page.orgDataArr[i].preyConst = document.getElementById("orgData_" + i + "_PREYCONST");
 				page.orgDataArr[i].loneConst = document.getElementById("orgData_" + i + "_LONECONST");
 				page.orgDataArr[i].startPop = document.getElementById("orgData_" + i + "_STARTPOP");
+				page.orgDataArr[i].carryCap = document.getElementById("orgData_" + i + "_CARRYCAP");
 			}
 			page.orgDataCont.style.display = "inline-block";
 			page.orgDataArr[0].name.focus();
@@ -260,7 +273,8 @@ function getOrgInput() {
 		var preyConst = page.orgDataArr[i].preyConst.value.split(",");
 		var loneConst = page.orgDataArr[i].loneConst.value;
 		var startPop = page.orgDataArr[i].startPop.value;
-		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst, loneConst, startPop));
+		var carryCap = page.orgDataArr[i].carryCap.value;
+		orgData.push(new Organism(name, i, pred, predConst, prey, preyConst, loneConst, startPop, carryCap));
 
 		popRecord.push([]);
 		popRecord[i].push([0, orgData[i].currentPop]);
@@ -485,7 +499,6 @@ function updatePop(dt, t) {
 			orgData[i].setPop(0);
 		}
 		popRecord[i].push([t-startTime, orgData[i].currentPop]);
-		console.log(popRecord[0][i][0] + " " + popRecord[0][i][1]);
 	}
 }
 function drawPop() {
