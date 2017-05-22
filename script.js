@@ -71,6 +71,9 @@ function Organism(name, id, pred, predC, prey, preyC, loneConst, startPop) {
 		this.currentPop += num;
 		return this.currentPop;
 	}
+	this.setPop = function(num) {
+		this.currentPop = num;
+	}
 }
 
 //------------------------------------------------------------
@@ -282,6 +285,7 @@ function br() {
 function startSimulation() {
 	console.log("FUNCTION CALL: startSimulation()");
 	
+	popRecord = [];
 	getOrgInput();
 	timeRate = Number(page.speedMult.value);
 	paused = false;
@@ -469,12 +473,12 @@ function updatePop(dt, t) {
 	var dPop = [];
 	for(var i=0; i<orgData.length; ++i) {
 		dPop[i] = orgData[i].dPdt(orgData, dt);
-		if(dPop[i] <= 0) {
-			dPop[i] = 0;
-		}
 	}
 	for(var i=0; i<orgData.length; ++i) {
-		orgData[i].addPop(dPop[i]);
+		var pop = orgData[i].addPop(dPop[i]);
+		if(pop < 0) {
+			orgData[i].setPop(0);
+		}
 		popRecord[i].push([t-startTime, orgData[i].currentPop]);
 		console.log(popRecord[0][i][0] + " " + popRecord[0][i][1]);
 	}
